@@ -4,6 +4,8 @@ class WalletConnect {
         this.googleAccount = null;
         this.wallets = [];
         this.userPicture = null;
+        this.accessToken = null;
+        this.spreadsheetId = null;
         this.loadWallets();
     }
 
@@ -36,9 +38,10 @@ class WalletConnect {
         try {
             const client = google.accounts.oauth2.initTokenClient({
                 client_id: '219393133871-8e9g6po55cdqosgm80nk22rbbcdcvema.apps.googleusercontent.com',
-                scope: 'email profile',
+                scope: 'email profile https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file',
                 callback: async (response) => {
                     if (response.access_token) {
+                        this.accessToken = response.access_token;
                         const userInfo = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
                             headers: { Authorization: `Bearer ${response.access_token}` }
                         }).then(res => res.json());
@@ -46,12 +49,8 @@ class WalletConnect {
                         this.googleAccount = userInfo.name || userInfo.email;
                         this.userPicture = userInfo.picture;
                         
-                        localStorage.setItem('googleAccount', this.googleAccount);
-                        localStorage.setItem('userPicture', this.userPicture);
-                        
                         this.updateGoogleButton(this.googleAccount, this.userPicture);
                         document.getElementById('wallet-register').style.display = 'block';
-                        this.renderWalletsList();
                     }
                 }
             });
@@ -59,6 +58,88 @@ class WalletConnect {
         } catch (error) {
             console.error('Error:', error);
             alert('Erro ao conectar com Google. Por favor, tente novamente.');
+        }
+    }
+
+    async createSpreadsheet() {
+        try {
+            const response = await fetch('https://sheets.googleapis.com/v4/spreadsheets', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.accessToken}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    properties: {
+                        title: `Web3 Wallets - ${this.googleAccount}`,
+                    },
+                    sheets: [{
+                        properties: {
+                            title: 'Wallets',
+                            gridProperties: {
+                                rowCount: 1000,
+                                columnCount: 7
+                            }
+                        },
+                        data: [{
+                            rowData: [{
+                                values: [
+                                    { userEnteredValue: { stringValue: 'Endereço' } },
+                                    { userEnteredValue: { stringValue: 'Nome' } },
+                                    { userEnteredValue: { stringValue: 'Descrição' } },
+                                    { userEnteredValue: { stringValue: 'Código Externo' } },
+                                    { userEnteredValue: { stringValue: 'Limite' } },
+                                    { userEnteredValue: { stringValue: 'Confiável' } },
+                                    { userEnteredValue: { stringValue: 'Data Cadastro' } }
+                                ]
+                            }]
+                        }]
+                    }]
+                })
+            });
+
+            const data = await response.json();
+            this.spreadsheetId = data.spreadsheetId;
+            return this.spreadsheetId;
+        } catch (error) {
+            console.error('Error creating spreadsheet:', error);
+            throw error;
+        }
+    }
+
+    async saveWalletToSheet(wallet) {
+        try {
+            // Create spreadsheet if it doesn't exist
+            if (!this.spreadsheetId) {
+                await this.createSpreadsheet();
+            }
+
+            const values = [[
+                wallet.address,
+                wallet.name,
+                wallet.description || '',
+                wallet.externalCode || '',
+                wallet.limit || '',
+                wallet.trusted ? 'Sim' : 'Não',
+                new Date().toISOString()
+            ]];
+
+            await fetch(
+                `https://sheets.googleapis.com/v4/spreadsheets/${this.spreadsheetId}/values/Wallets:append?valueInputOption=USER_ENTERED`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ values })
+                }
+            );
+
+            return true;
+        } catch (error) {
+            console.error('Error saving wallet:', error);
+            throw error;
         }
     }
 
@@ -119,28 +200,36 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const formData = new FormData(e.target);
         
-        const newWallet = {
-            address: formData.get('address'),
-            name: formData.get('name'),
-            description: formData.get('description'),
-            externalCode: formData.get('external-code'),
-            limit: formData.get('limit'),
-            trusted: formData.get('trusted') === 'on',
-            createdAt: new Date().toISOString()
-        };
+        try {
+            const newWallet = {
+                address: formData.get('address'),
+                name: formData.get('name'),
+                description: formData.get('description'),
+                externalCode: formData.get('external-code'),
+                limit: formData.get('limit'),
+                trusted: formData.get('trusted') === 'on',
+                createdAt: new Date().toISOString()
+            };
 
-        // Check for duplicates
-        if (walletConnect.wallets.some(w => w.address === newWallet.address)) {
-            alert('Esta carteira já está cadastrada!');
-            return;
+            // Check for duplicates
+            if (walletConnect.wallets.some(w => w.address === newWallet.address)) {
+                alert('Esta carteira já está cadastrada!');
+                return;
+            }
+
+            // Save to localStorage
+            walletConnect.wallets.push(newWallet);
+            walletConnect.saveWallets();
+            walletConnect.renderWalletsList();
+
+            // Save to Google Sheet
+            await walletConnect.saveWalletToSheet(newWallet);
+            
+            alert('Carteira salva com sucesso!');
+            e.target.reset();
+        } catch (error) {
+            console.error('Error saving wallet:', error);
+            alert('Erro ao salvar carteira. Verifique o console para mais detalhes.');
         }
-
-        // Add new wallet
-        walletConnect.wallets.push(newWallet);
-        walletConnect.saveWallets();
-        walletConnect.renderWalletsList();
-        
-        alert('Carteira salva com sucesso!');
-        e.target.reset();
     });
 });
