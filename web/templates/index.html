@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">Alternar tema</button>
+    <button id="wallet-connect-btn" onclick="walletConnect.showWalletPopup()">Conectar Carteira</button>
+    <button id="google-connect-btn" onclick="walletConnect.connectGoogle()">Conectar com Google</button>
+    <div class="container">
+        <h1>{{ .Header }}</h1>
+        <p>{{ .Message }}</p>
+        
+        <div id="wallet-register" class="wallet-register" style="display: none;">
+            <h2>Cadastro de Carteira</h2>
+            <form id="wallet-form" class="wallet-form">
+                <div class="form-group">
+                    <label for="address">Endereço *
+                        <span class="help-text">Endereço público de carteira</span>
+                    </label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Nome *
+                        <span class="help-text">Nome para identificação</span>
+                    </label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição
+                        <span class="help-text">Pequena descrição sobre</span>
+                    </label>
+                    <textarea id="description" name="description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="external-code">Código Externo
+                        <span class="help-text">Código de cliente caso possua um ERP</span>
+                    </label>
+                    <input type="text" id="external-code" name="external-code">
+                </div>
+
+                <div class="form-group">
+                    <label for="limit">Limite
+                        <span class="help-text">Limite para transferência</span>
+                    </label>
+                    <input type="number" id="limit" name="limit" step="0.01">
+                </div>
+
+                <div class="form-group checkbox-group">
+                    <label for="trusted">
+                        <input type="checkbox" id="trusted" name="trusted">
+                        Confiável
+                        <span class="help-text">Dispensa confirmação para transferências</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="submit-btn">Cadastrar</button>
+            </form>
+
+            <div id="wallets-list" class="wallets-list"></div>
+        </div>
+    </div>
+    <script src="/static/theme.js"></script>
+    <script src="/static/wallet.js"></script>
+</body>
+</html>

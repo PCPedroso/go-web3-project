@@ -1,0 +1,282 @@
+:root {
+  --bg-color: #181a1b;
+  --text-color: #f3f3f3;
+  --primary-color: #4f8cff;
+  --secondary-color: #23272a;
+  --border-radius: 8px;
+  --transition: 0.3s;
+}
+
+body {
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Light theme overrides */
+body.light {
+  --bg-color: #f3f3f3;
+  --text-color: #181a1b;
+  --secondary-color: #fff;
+}
+
+.wallet-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1b1f;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+    width: 400px;
+    z-index: 1000;
+}
+
+.wallet-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.wallet-popup-title {
+    color: #fff;
+    font-size: 1.2em;
+    font-weight: 600;
+}
+
+.wallet-popup-close {
+    cursor: pointer;
+    color: #666;
+    font-size: 1.5em;
+}
+
+.wallet-option {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.wallet-option:hover {
+    background: #2c2d33;
+}
+
+.wallet-option[onclick*="connectGoogle"] {
+    background: #ffffff14;
+    border: 1px solid #ffffff22;
+}
+
+.wallet-option[onclick*="connectGoogle"]:hover {
+    background: #ffffff1a;
+}
+
+.wallet-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 12px;
+}
+
+.wallet-name {
+    color: #fff;
+    font-size: 1em;
+}
+
+.wallet-label {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: auto;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+#google-connect-btn {
+    background: #fff;
+    color: #444;
+    border: 1px solid #ddd;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    justify-content: center;
+}
+
+#google-connect-btn:hover {
+    background: #f5f5f5;
+}
+
+#google-connect-btn.connected {
+    background: var(--bg-color);
+    border: 1px solid var(--primary-color);
+    color: var(--text-color);
+}
+
+.google-user-pic {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.wallet-register {
+    background: var(--secondary-color);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    margin-top: 20px;
+}
+
+.wallet-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.help-text {
+    font-size: 0.8em;
+    color: #666;
+    margin-left: 5px;
+    font-weight: normal;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group textarea {
+    padding: 8px 12px;
+    border: 1px solid #333;
+    border-radius: var(--border-radius);
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.submit-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s;
+}
+
+.submit-btn:hover {
+    background: #3561b7;
+}
+
+.wallets-list {
+    margin-top: 20px;
+}
+
+.wallet-item {
+    background: var(--bg-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.wallet-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.wallet-address {
+    font-family: monospace;
+    color: var(--primary-color);
+    margin: 5px 0;
+}
+
+.wallet-details {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+.trusted {
+    color: #4CAF50;
+}
+
+.spreadsheet-info {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--bg-color);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+}
+
+.info-box {
+    color: var(--text-color);
+}
+
+.sheet-name {
+    font-family: monospace;
+    font-size: 1.1em;
+    color: var(--primary-color);
+    padding: 8px;
+    background: rgba(79, 140, 255, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.warning-text {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: var(--border-radius);
+}
+
+.warning-text ul {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.warning-text li {
+    margin: 5px 0;
+    color: #ff9800;
+}
